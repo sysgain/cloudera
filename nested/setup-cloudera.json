@@ -74,10 +74,10 @@
            "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "[concat(parameters('scriptsUri'), 'scripts/bootstrap-cloudera.sh?token=AT3p4UYx8c79opbTbAuBBwMxDJRD-N4Oks5YZL41wA%3D%3D')]",
-            "[concat(parameters('scriptsUri'), 'scripts/initialize-cloudera-server.sh?token=AT3p4WcXSHH1bWFzXtU8z_Y5mLqTPnJDks5YZL5UwA%3D%3D')]",
-            "[concat(parameters('scriptsUri'), 'scripts/cmxDeployOnIbiza.py?token=AT3p4adHf9asHRp1azQqnWBafRHjwXWQks5YZL5wwA%3D%3D')]",
-            "[concat(parameters('scriptsUri'), 'scripts/install-postgresql.sh?token=AT3p4U4gcZEaM8d_UKPpaNlw4i0Dv_Svks5YZL6JwA%3D%3D')]"
+            "[concat(parameters('scriptsUri'), 'scripts/bootstrap-cloudera.sh')]",
+            "[concat(parameters('scriptsUri'), 'scripts/initialize-cloudera-server.sh')]",
+            "[concat(parameters('scriptsUri'), 'scripts/cmxDeployOnIbiza.py')]",
+            "[concat(parameters('scriptsUri'), 'scripts/install-postgresql.sh')]"
           ]
         },
         "protectedSettings": {
