@@ -1,0 +1,427 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUserName": {
+            "type": "string",
+            "defaultValue": "azureuser",
+            "metadata": {
+                "description": "Admin user name for the VMs"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": "P@ssword!234",
+            "metadata": {
+                "description": "Admin password for the VMs (A mix of upper and lower-case characters, digits and symbols)"
+            }
+        },
+        "cmUsername": {
+            "type": "string",
+            "defaultValue": "cmadmin",
+            "metadata": {
+                "description": "User name for the Cloudera Manager"
+            }
+        },
+        "cmPassword": {
+            "type": "securestring",
+            "defaultValue": "P@ssword!234",
+            "metadata": {
+                "description": "password for the Cloudera Manager (A mix of upper and lower-case characters, digits and symbols)"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "westus",
+            "allowedValues": [
+                "westus",
+                "eastus",
+                "northeurope",
+                "westeurope",
+                "eastasia",
+                "southeastasia",
+                "southcentralus",
+                "centralus",
+                "eastus2",
+                "japaneast",
+                "japanwest",
+                "australiaeast",
+                "australiasoutheast"
+            ],
+            "metadata": {
+                "description": "Location where resources will be provisioned (must support premium storage)"
+            }
+        },
+        "vnetNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Indicator for new or exiting Virtual Network"
+            }
+        },
+        "virtualNetworkRGName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Resource Group Name for Vnet. For new VNet leave it empty, otherwise type in existing resource group name"
+            }
+        },
+        "tshirtSize": {
+            "type": "string",
+            "defaultValue": "Eval",
+            "allowedValues": [
+                "Eval",
+                "Prod"
+            ],
+            "metadata": {
+                "description": "T-shirt size of the Cloudera cluster (Eval, Prod)"
+            }
+        },
+        "businessPhone": {
+            "type": "string",
+            "defaultValue": "123456789",
+            "metadata": {
+                "description": "your business phone number"
+            }
+        },
+        "firstName": {
+            "type": "string",
+            "defaultValue": "FirstName",
+            "metadata": {
+                "description": "Your FirstName"
+            }
+        },
+        "lastName": {
+            "type": "string",
+            "defaultValue": "LastName",
+            "metadata": {
+                "description": "Your LastName"
+            }
+        },
+        "jobRole": {
+            "type": "string",
+            "defaultValue": "Administrator",
+            "metadata": {
+                "description": "Job Role"
+            },
+            "allowedValues": [
+                "Administrator",
+                "Analyst (Industry/Finance)",
+                "Analyst (Technical)",
+                "Architect",
+                "C level",
+                "Consultant",
+                "Developer",
+                "Director",
+                "Engineer",
+                "Individual contributor",
+                "Manager",
+                "Partner",
+                "Student",
+                "VP"
+            ]
+        },
+        "jobFunction": {
+            "type": "string",
+            "defaultValue": "Analytics / Business Intelligence",
+            "metadata": {
+                "description": "Job Function"
+            },
+            "allowedValues": [
+                "Analytics / Business Intelligence",
+                "Big Data / Architecture",
+                "Data Warehouse / Management",
+                "Data Science",
+                "Database",
+                "ETL / ELT",
+                "Infrastructure",
+                "IT",
+                "Marketing / Sales",
+                "Networking",
+                "Manager",
+                "Security / Compliance",
+                "Storage"
+            ]
+        },
+        "templateUrl": {
+            "type": "string",
+            "metadata": {
+                "artifactsBaseUrl": "Base URL of the Cloudera Template gallery package"
+            },
+            "defaultValue": "https://raw.githubusercontent.com/sysgain/arm-components/cloudera-cluster/cloudera-cluster/"
+        }
+    },
+    "variables": {
+        "uid": "[uniqueString(resourceGroup().id)]",
+        "prefix": "[substring(variables('uid') ,0 ,5)]",
+        "storageAccountPrefix": "[concat('stracnt',variables('prefix'))]",
+        "dnsNamePrefix": "[concat('dns',variables('prefix'))]",
+        "workerStorageAccountType":"Standard_LRS",
+        "masterStorageAccountType":"Premium_LRS",
+        "virtualNetworkName":"[concat('cl',variables('prefix'),'-vnet')]",
+        "subnetName":"[concat('cl',variables('prefix'),'-subnet')]",
+        "addressPrefix":"10.3.0.0/16",
+        "subnetPrefix":"10.3.0.0/16",
+        "masterNodeIPAddress":"10.3.0.4",
+        "dataNodeIPOffSetFromMaster":5,
+        "numberOfDataNodes":3,
+        "vmSize":"Standard_DS14",
+        "company":"company",
+        "emailAddress": "email@yourcompany.com",
+        "templateAPIVersion": "2015-11-01",
+        "resourceAPIVersion": "2015-06-15",
+        "installCDH": "True",
+        "scriptsUri": "[parameters('templateUrl')]",
+        "share-resourcesUri": "[concat(variables('scriptsUri'), 'nested/shared-resources-', parameters('vnetNewOrExisting'), '-vnet.json?token=AT3p4Z4loP-D81OorfnU7sZwoj6XtMxgks5YZKNywA%3D%3D')]",
+        "data-nodeUri": "[concat(variables('scriptsUri'), 'nested/data-node-', toLower(subString(variables('vmSize'), 9, 4)), '.json?token=AT3p4eahys_pa77s1O9-kePuNvcr26Ymks5YZKOZwA%3D%3D')]",
+        "sa": "[variables('masterNodeIPAddress')]",
+        "ipOctet01": "[concat(split(variables('sa'), '.')[0], '.', split(variables('sa'), '.')[1], '.')]",
+        "ipOctet2": "[int(split(variables('sa'), '.')[2])]",
+        "ipOctet3": "[int(split(variables('sa'), '.')[3])]",
+        "datanodeIpOctet3": "[add(int(split(variables('sa'), '.')[3]), variables('dataNodeIPOffSetFromMaster'))]",
+        "masterStorageAccount": {
+            "prefix": "[variables('storageAccountPrefix')]",
+            "type": "[variables('masterStorageAccountType')]"
+        },
+        "workerStorageAccount": {
+            "prefix": "[variables('storageAccountPrefix')]",
+            "type": "[variables('workerStorageAccountType')]"
+        },
+        "clusterTshirtSizeEval": {
+            "masterNodeCount": 1,
+            "dataNodeCount": "[int(variables('numberOfDataNodes'))]",
+            "highAvailability": "false"
+        },
+        "clusterTshirtSizeProd": {
+            "masterNodeCount": 3,
+            "dataNodeCount": "[int(variables('numberOfDataNodes'))]",
+            "highAvailability": "true"
+        },
+        "clusterSpec": "[variables(concat('clusterTshirtSize', parameters('tshirtSize')))]",
+        "vmSpec": {
+            "vmSize": "[variables('vmSize')]",
+            "adminUserName": "[parameters('adminUserName')]",
+            "adminPassword": "[parameters('adminPassword')]",
+            "masterNodeASName": "[concat(variables('dnsNamePrefix'), '-mnAS')]",
+            "dataNodeASName": "[concat(variables('dnsNamePrefix'), '-dnAS')]"
+        },
+        "networkSpec": {
+            "addressPrefix": "[variables('addressPrefix')]",
+            "subnetPrefix": "[variables('subnetPrefix')]",
+            "ipOctet01": "[variables('ipOctet01')]",
+            "ipOctet2": "[variables('ipOctet2')]",
+            "ipOctet3": "[variables('ipOctet3')]",
+            "datanodeIpOctet3": "[variables('datanodeIpOctet3')]",
+            "masterIP": "[variables('sa')]",
+            "workerIP": "[concat(variables('ipOctet01'), add(variables('ipOctet2'), div(variables('datanodeIpOctet3'), 255)), '.', mod(variables('datanodeIpOctet3'), 255))]",
+            "virtualNetworkName": "[variables('virtualNetworkName')]",
+            "virtualNetworkRGName": "[parameters('virtualNetworkRGName')]",
+            "vnetNewOrExisting": "[parameters('vnetNewOrExisting')]",
+            "virtualNetworkSubnetName": "[variables('subnetName')]"
+        },
+        "newVNetId": "[resourceId(concat('Microsoft.Network','/','virtualNetworks'),variables('virtualNetworkName'))]",
+        "existingVNetId": "[resourceId(parameters('virtualNetworkRGName'),concat('Microsoft.Network','/','virtualNetworks'),variables('virtualNetworkName'))]",
+        "VNetId": "[variables(concat(parameters('vnetNewOrExisting'),'VNetId'))]"
+    },
+    "resources": [
+        {
+            "name": "shared-resources",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('templateAPIVersion')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('share-resourcesUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "resourceAPIVersion": {
+                        "value": "[variables('resourceAPIVersion')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "networkSpec": {
+                        "value": "[variables('networkSpec')]"
+                    },
+                    "masterNodeASName": {
+                        "value": "[variables('vmSpec').masterNodeASName]"
+                    },
+                    "dataNodeASName": {
+                        "value": "[variables('vmSpec').dataNodeASName]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "master-node",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('templateAPIVersion')]",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/shared-resources"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('scriptsUri'), 'nested/master-node.json?token=AT3p4a29slnZUQFyQwARCRoL5tGqy0rhks5YZKPEwA%3D%3D')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vnetID": {
+                        "value": "[variables('VNetId')]"
+                    },
+                    "resourceAPIVersion": {
+                        "value": "[variables('resourceAPIVersion')]"
+                    },
+                    "dnsNamePrefix": {
+                        "value": "[variables('dnsNamePrefix')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "scriptsUri": {
+                        "value": "[variables('scriptsUri')]"
+                    },
+                    "storageAccount": {
+                        "value": "[variables('masterStorageAccount')]"
+                    },
+                    "vmCount": {
+                        "value": "[variables('clusterSpec').masterNodeCount]"
+                    },
+                    "vmSpec": {
+                        "value": "[variables('vmSpec')]"
+                    },
+                    "networkSpec": {
+                        "value": "[variables('networkSpec')]"
+                    },
+                    "clusterSpec": {
+                        "value": "[variables('clusterSpec')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "data-node",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('templateAPIVersion')]",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/shared-resources"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('data-nodeUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vnetID": {
+                        "value": "[variables('VNetId')]"
+                    },
+                    "resourceAPIVersion": {
+                        "value": "[variables('resourceAPIVersion')]"
+                    },
+                    "dnsNamePrefix": {
+                        "value": "[variables('dnsNamePrefix')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "scriptsUri": {
+                        "value": "[variables('scriptsUri')]"
+                    },
+                    "storageAccount": {
+                        "value": "[variables('workerStorageAccount')]"
+                    },
+                    "vmCount": {
+                        "value": "[variables('clusterSpec').dataNodeCount]"
+                    },
+                    "vmSpec": {
+                        "value": "[variables('vmSpec')]"
+                    },
+                    "networkSpec": {
+                        "value": "[variables('networkSpec')]"
+                    },
+                    "clusterSpec": {
+                        "value": "[variables('clusterSpec')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "setup-cloudera",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('templateAPIVersion')]",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/data-node",
+                "Microsoft.Resources/deployments/master-node"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('scriptsUri'), 'nested/setup-cloudera.json?token=AT3p4cYLi4aFARhArPKbNn3YhgxGs8MRks5YZL6swA%3D%3D')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "resourceAPIVersion": {
+                        "value": "[variables('resourceAPIVersion')]"
+                    },
+                    "dnsNamePrefix": {
+                        "value": "[variables('dnsNamePrefix')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "scriptsUri": {
+                        "value": "[variables('scriptsUri')]"
+                    },
+                    "vmSpec": {
+                        "value": "[variables('vmSpec')]"
+                    },
+                    "networkSpec": {
+                        "value": "[variables('networkSpec')]"
+                    },
+                    "clusterSpec": {
+                        "value": "[variables('clusterSpec')]"
+                    },
+                    "fqdn": {
+                        "value": "[reference('master-node').outputs.fqdn.value]"
+                    },
+                    "cmUsername": {
+                        "value": "[parameters('cmUsername')]"
+                    },
+                    "cmPassword": {
+                        "value": "[parameters('cmPassword')]"
+                    },
+                    "company": {
+                        "value": "[variables('Company')]"
+                    },
+                    "emailAddress": {
+                        "value": "[variables('emailAddress')]"
+                    },
+                    "businessPhone": {
+                        "value": "[parameters('businessPhone')]"
+                    },
+                    "firstName": {
+                        "value": "[parameters('firstName')]"
+                    },
+                    "lastName": {
+                        "value": "[parameters('lastName')]"
+                    },
+                    "jobRole": {
+                        "value": "[parameters('jobRole')]"
+                    },
+                    "jobFunction": {
+                        "value": "[parameters('jobFunction')]"
+                    },
+                    "installCDH": {
+                        "value": "[variables('installCDH')]"
+                    }
+                }
+            }
+        }
+    ]
+}
