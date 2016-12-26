@@ -152,7 +152,7 @@
             "metadata": {
                 "artifactsBaseUrl": "Base URL of the Cloudera Template gallery package"
             },
-            "defaultValue": "https://raw.githubusercontent.com/sysgain/arm-components/cloudera-cluster/cloudera-cluster/"
+            "defaultValue": "https://raw.githubusercontent.com/sysgain/cloudera/master/"
         }
     },
     "variables": {
