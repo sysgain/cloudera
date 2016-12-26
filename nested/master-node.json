@@ -415,9 +415,9 @@
       "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "[concat(parameters('scriptsUri'), 'scripts/prepare-masternode-disks.sh?token=AT3p4fEfeRmy4dDfbAmgrKjvPjxokS6fks5YZiuywA%3D%3D')]",
-            "[concat(parameters('scriptsUri'), 'scripts/initialize-node.sh?token=AT3p4Xs0tDLsPhWVkSYSxgngw-WcbQOsks5YZivYwA%3D%3D')]",
-            "[concat(parameters('scriptsUri'), 'scripts/script.sh?token=AT3p4VD2MXacpnFgz2hyOitaGLADu2aBks5YZi9NwA%3D%3D')]"
+            "[concat(parameters('scriptsUri'), 'scripts/prepare-masternode-disks.sh')]",
+            "[concat(parameters('scriptsUri'), 'scripts/initialize-node.sh')]",
+            "[concat(parameters('scriptsUri'), 'scripts/script.sh')]"
           ],
           "commandToExecute": "[concat('sh initialize-node.sh \"', variables('masterIP'), '\" \"', variables('workerIP'), '\" \"', parameters('dnsNamePrefix'), '\" \"', reference(concat(variables('publicIPAddressName'), copyIndex())).dnsSettings.fqdn, '\" ', parameters('clusterSpec').masterNodeCount, ' ', parameters('clusterSpec').dataNodeCount, ' \"', parameters('vmSpec').adminUserName, '\" ', 'masternode', ' >> /home/$ADMINUSER/initialize-datanode.log 2>&1')]"
         }
