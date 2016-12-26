@@ -176,8 +176,8 @@
         "resourceAPIVersion": "2015-06-15",
         "installCDH": "True",
         "scriptsUri": "[parameters('templateUrl')]",
-        "share-resourcesUri": "[concat(variables('scriptsUri'), 'nested/shared-resources-', parameters('vnetNewOrExisting'), '-vnet.json?token=AT3p4Z4loP-D81OorfnU7sZwoj6XtMxgks5YZKNywA%3D%3D')]",
-        "data-nodeUri": "[concat(variables('scriptsUri'), 'nested/data-node-', toLower(subString(variables('vmSize'), 9, 4)), '.json?token=AT3p4eahys_pa77s1O9-kePuNvcr26Ymks5YZKOZwA%3D%3D')]",
+        "share-resourcesUri": "[concat(variables('scriptsUri'), 'nested/shared-resources-', parameters('vnetNewOrExisting'), '-vnet.json')]",
+        "data-nodeUri": "[concat(variables('scriptsUri'), 'nested/data-node-', toLower(subString(variables('vmSize'), 9, 4)), '.json')]",
         "sa": "[variables('masterNodeIPAddress')]",
         "ipOctet01": "[concat(split(variables('sa'), '.')[0], '.', split(variables('sa'), '.')[1], '.')]",
         "ipOctet2": "[int(split(variables('sa'), '.')[2])]",
@@ -267,7 +267,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('scriptsUri'), 'nested/master-node.json?token=AT3p4a29slnZUQFyQwARCRoL5tGqy0rhks5YZKPEwA%3D%3D')]",
+                    "uri": "[concat(variables('scriptsUri'), 'nested/master-node.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -362,7 +362,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('scriptsUri'), 'nested/setup-cloudera.json?token=AT3p4cYLi4aFARhArPKbNn3YhgxGs8MRks5YZL6swA%3D%3D')]",
+                    "uri": "[concat(variables('scriptsUri'), 'nested/setup-cloudera.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
