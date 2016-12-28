@@ -221,6 +221,20 @@
             }
           },
           {
+            "name": "solrwebui",
+            "properties": {
+              "description": "Allow solr web traffic",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "8983",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 120,
+              "direction": "Inbound"
+            }
+          },
+          {
             "name": "Impala.Shell",
             "properties": {
               "description": "Allow Impala Shell traffic",
