@@ -482,10 +482,10 @@
          "ClouderaManagerUrl": {
             "type": "string",
             "value": "[concat(reference('master-node').outputs.fqdn.value,':7180')]"
-        }
+        },
         "SolrUrl": {
             "type": "string",
-            "value": "[concat(reference('master-node').outputs.fqdn.value,':8983/solr/')]"
+            "value": "[concat(variables('dnsNamePrefix'),'-dn0','.',parameters('location'),'.cloudapp.azure.com':8983/solr/')]"
         }
         
     }
