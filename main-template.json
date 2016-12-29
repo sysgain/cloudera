@@ -485,7 +485,7 @@
         },
         "SolrUrl": {
             "type": "string",
-            "value": "[concat(variables('dnsNamePrefix'),'-dn0','.',parameters('location'),'.cloudapp.azure.com':8983/solr/')]"
+            "value": "[concat(variables('dnsNamePrefix'),'-dn0','.',parameters('location'),'.cloudapp.azure.com:8983/solr/')]"
         }
         
     }
