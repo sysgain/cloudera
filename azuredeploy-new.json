@@ -38,6 +38,7 @@
     },
     "dnsNamePrefix": {
       "type": "string",
+      "defaultValue": "cloudera",
       "metadata": {
         "description": "Unique public DNS name where the VMs will be exposed"
       }
@@ -223,6 +224,7 @@
     }
   },
   "variables": {
+    "dnsNamePrefix": "[concat(parameters('dnsNamePrefix'),uniqueString('resourceGroup().id'))]",
     "templateAPIVersion":"2015-11-01",
     "resourceAPIVersion":"2015-06-15",
     "installCDH":"True",
@@ -259,8 +261,8 @@
       "vmSize": "[parameters('vmSize')]",
       "adminUserName": "[parameters('adminUserName')]",
       "adminPassword": "[parameters('adminPassword')]",
-      "masterNodeASName": "[concat(parameters('dnsNamePrefix'), '-mnAS')]",
-      "dataNodeASName": "[concat(parameters('dnsNamePrefix'), '-dnAS')]"
+      "masterNodeASName": "[concat(variables('dnsNamePrefix'), '-mnAS')]",
+      "dataNodeASName": "[concat(variables('dnsNamePrefix'), '-dnAS')]"
     },
     "networkSpec": {
       "addressPrefix": "[variables('addressPrefix')]",
@@ -328,7 +330,7 @@
             "value":"[variables('resourceAPIVersion')]"
           },
           "dnsNamePrefix": {
-            "value": "[parameters('dnsNamePrefix')]"
+            "value": "[variables('dnsNamePrefix')]"
           },
           "scriptsUri": {
             "value": "[variables('scriptsUri')]"
@@ -372,7 +374,7 @@
             "value":"[variables('resourceAPIVersion')]"
           },
           "dnsNamePrefix": {
-            "value": "[parameters('dnsNamePrefix')]"
+            "value": "[variables('dnsNamePrefix')]"
           },
           "scriptsUri": {
             "value": "[variables('scriptsUri')]"
@@ -414,7 +416,7 @@
             "value":"[variables('resourceAPIVersion')]"
           },
           "dnsNamePrefix": {
-            "value": "[parameters('dnsNamePrefix')]"
+            "value": "[variables('dnsNamePrefix')]"
           },
           "scriptsUri": {
             "value": "[variables('scriptsUri')]"
@@ -476,7 +478,7 @@
         },
          "ClouderaManagerUrl": {
             "type": "string",
-            "value": "[concat(variables('dnsName'),'.',parameters('location'),'.cloudapp.azure.com')]"
+            "value": "[concat(variables('dnsNamePrefix'),'.',parameters('location'),'.cloudapp.azure.com')]"
         }
         
         
