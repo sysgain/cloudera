@@ -227,6 +227,7 @@
   "variables": {
     "dnsNamePrefix": "[concat(parameters('dnsNamePrefix'),uniqueString('resourceGroup().id'))]",
     "storageAccountPrefix":"[concat(parameters('storageAccountPrefix'),uniqueString('resourceGroup().id'))]",
+    "location": "[resourceGroup().location]",
     "templateAPIVersion":"2015-11-01",
     "resourceAPIVersion":"2015-06-15",
     "installCDH":"True",
@@ -480,7 +481,7 @@
         },
          "ClouderaManagerUrl": {
             "type": "string",
-            "value": "[concat(variables('dnsNamePrefix'),'.',parameters('location'),'.cloudapp.azure.com')]"
+            "value": "[concat(variables('dnsNamePrefix'),'.',variables('location'),'.cloudapp.azure.com:7180/')]"
         }
         
         
