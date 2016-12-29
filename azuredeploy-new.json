@@ -477,9 +477,9 @@
          "ClouderaManagerUrl": {
             "type": "string",
             "value": "[concat(variables('dnsName'),'.',parameters('location'),'.cloudapp.azure.com')]"
-        },
+        }
         
         
     }
 }
-}
+
