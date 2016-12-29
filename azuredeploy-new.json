@@ -481,7 +481,7 @@
         },
          "ClouderaManagerUrl": {
             "type": "string",
-            "value": "[concat(variables('dnsNamePrefix'),'.',variables('location'),'.cloudapp.azure.com:7180/')]"
+            "value": "[concat(variables('dnsNamePrefix'),'-mn0','.',variables('location'),'.cloudapp.azure.com:7180')]"
         }
         
         
