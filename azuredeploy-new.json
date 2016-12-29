@@ -4,26 +4,28 @@
   "parameters": {
     "adminUserName": {
       "type": "string",
-      "defaultValue": "azureuser",
+      "defaultValue": "cloudera",
       "metadata": {
         "description": "Admin user name for the VMs"
       }
     },
     "adminPassword": {
       "type": "securestring",
+      "defaultValue": "Cloudera@123",
       "metadata": {
         "description": "Admin password for the VMs (A mix of upper and lower-case characters, digits and symbols)"
       }
     },
     "cmUsername": {
       "type": "string",
-      "defaultValue": "cmadmin",
+      "defaultValue": "cloudera",
       "metadata": {
         "description": "User name for the Cloudera Manager"
       }
     },
     "cmPassword": {
       "type": "securestring",
+      "defaultValue": "Cloudera@123",
       "metadata": {
         "description": "password for the Cloudera Manager (A mix of upper and lower-case characters, digits and symbols)"
       }
@@ -462,5 +464,22 @@
         }
       }
     }
-  ]
+  ],
+  "outputs": {
+        "ClouderaManagerUserName": {
+            "type": "string",
+            "value": "[parameters('cmUsername')]"
+        },
+    "Password": {
+            "type": "string",
+            "value": "[parameters('cmPassword')]"
+        },
+         "ClouderaManagerUrl": {
+            "type": "string",
+            "value": "[concat(variables('dnsName'),'.',parameters('location'),'.cloudapp.azure.com')]"
+        },
+        
+        
+    }
+}
 }
